@@ -14,16 +14,17 @@ namespace Graviton2Presentation
         public static void Main(string[] args)
         {
             string stackName = "GravitonID";
-            Program program = CreateProgram(stackName);
+            bool isCloud9 = true;
+            Program program = CreateProgram(stackName,isCloud9);
             program.Synth();
         }
 
-        private static Program CreateProgram(string stackName)
+        private static Program CreateProgram(string stackName,bool isCloud9)
         {
             Program program = new Program();
             program._app = new App();
             program._vpcStack = new VpcStack(program._app, $"{stackName}-base", CreateStackProps());
-            program._eksStack = new EksStack(program._app, $"{stackName}-eks", program._vpcStack.Vpc , CreateStackProps());
+            program._eksStack = new EksStack(program._app, $"{stackName}-eks", program._vpcStack.Vpc , isCloud9, CreateStackProps());
             program._pipelineStack = new PipelineStack(program._app, $"{stackName}-pipeline", CreateStackProps());
             return program;
         }

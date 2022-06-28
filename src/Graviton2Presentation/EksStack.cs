@@ -15,7 +15,7 @@ public class EksStack:Stack
     public Cluster Cluster { get; private set; }
     public Nodegroup Nodegroup86 { get; private set; }
     public Nodegroup NodegroupArm64 { get; private set; }
-    internal EksStack(Construct scope, string id, Vpc vpc , IStackProps props = null) : base(scope, id,
+    internal EksStack(Construct scope, string id, Vpc vpc , bool isCloud9 , IStackProps props = null) : base(scope, id,
         props)
     {
         var eksSecurityGroup = new SecurityGroup(this, "EKSSecurityGroup", new SecurityGroupProps()
@@ -24,6 +24,12 @@ public class EksStack:Stack
             AllowAllOutbound = true
         });
         eksSecurityGroup.AddIngressRule(Peer.Ipv4("10.0.0.0/16"), Port.AllTraffic());
+        if (isCloud9)
+        {
+            string c9Ip = $"{System.Environment.GetEnvironmentVariable("C9_HOSTNAME")}/32";
+            eksSecurityGroup.AddIngressRule(Peer.Ipv4(c9Ip), Port.AllTraffic());
+        }
+
         Cluster = new Cluster(this, "EKSGraviton2", new ClusterProps()
         {
             Version = KubernetesVersion.V1_20,
